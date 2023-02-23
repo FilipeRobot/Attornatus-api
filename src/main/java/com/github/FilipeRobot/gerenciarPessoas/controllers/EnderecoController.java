@@ -23,13 +23,13 @@ public class EnderecoController {
 
     @GetMapping("/")
     public ResponseEntity<List<Endereco>> ListarEnderecos(@PathVariable UUID pessoaId) {
-        return ResponseEntity.ok().body(enderecoService.listarEnderecoDaPessoa(pessoaId));
+        return ResponseEntity.ok().body(enderecoService.findAddressOfPeople(pessoaId));
     }
 
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> criarEndereco(@RequestBody Endereco endereco, @PathVariable UUID pessoaId) {
-        Endereco newEndereco = this.enderecoService.registrarEndereco(endereco, pessoaId);
+        Endereco newEndereco = this.enderecoService.saveAddress(endereco, pessoaId);
 
         return ResponseEntity.ok().build();
     }
@@ -37,13 +37,13 @@ public class EnderecoController {
     @PutMapping("/atualizar/{enderecoId}")
     public ResponseEntity<Void> atualizarEndereco(@PathVariable UUID pessoaId, @PathVariable Long enderecoId, @RequestBody Endereco newEndereco) {
         newEndereco.setId(enderecoId);
-        this.enderecoService.atualizarEndereco(pessoaId, newEndereco.getId(), newEndereco);
+        this.enderecoService.updateAddress(pessoaId, newEndereco.getId(), newEndereco);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/principal/{enderecoId}")
     public ResponseEntity<Void> atualizarEnderecoPrincipal(@PathVariable UUID pessoaId, @PathVariable Long enderecoId) {
-        this.enderecoService.atualizarEnderecoPrincipal(pessoaId, enderecoId);
+        this.enderecoService.updateMainAddress(pessoaId, enderecoId);
 
         return ResponseEntity.ok().build();
     }

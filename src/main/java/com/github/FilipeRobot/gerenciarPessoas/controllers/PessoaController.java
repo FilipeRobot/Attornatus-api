@@ -25,29 +25,29 @@ public class PessoaController {
     @Autowired
     private EnderecoService enderecoService;
 
-    @GetMapping("/todas")
-    public ResponseEntity<List<Pessoa>> buscarPessoas() {
-        return ResponseEntity.ok().body(this.pessoaService.buscarTodasAsPessoas());
+    @GetMapping("/lista")
+    public ResponseEntity<List<Pessoa>> gerarListaDePessoas() {
+        return ResponseEntity.ok().body(this.pessoaService.findAllPeople());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Pessoa> buscarPessoaPorId(@PathVariable UUID id) {
-        Pessoa pessoa = this.pessoaService.buscarPessoaPorId(id);
+        Pessoa pessoa = this.pessoaService.findPeopleById(id);
         return ResponseEntity.ok().body(pessoa);
     }
 
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> criarPessoaComEndereco(@RequestBody Pessoa pessoa) {
-        if (pessoa.getEndereco() == null){
+    public ResponseEntity<Void> cadastrarPessoa(@RequestBody Pessoa pessoa) {
+        if (pessoa.getEndereco() == null) {
             pessoa.setEndereco(new ArrayList<>());
         }
 
-        Pessoa newPessoa = this.pessoaService.registrarPessoa(pessoa);
+        Pessoa newPessoa = this.pessoaService.savePeople(pessoa);
 
         if (pessoa.getEndereco().size() > 0 || pessoa.getEndereco() != null) {
             pessoa.getEndereco().forEach(endereco -> {
-                this.enderecoService.registrarEndereco(endereco, newPessoa.getId());
+                this.enderecoService.saveAddress(endereco, newPessoa.getId());
             });
         }
 
@@ -58,18 +58,18 @@ public class PessoaController {
     @PutMapping("/editar/{id}")
     public ResponseEntity<Void> editarPessoa(@RequestBody Pessoa pessoa, @PathVariable UUID id) {
         pessoa.setId(id);
-        Pessoa oldPessoa = this.pessoaService.buscarPessoaPorId(pessoa.getId());
+        Pessoa oldPessoa = this.pessoaService.findPeopleById(pessoa.getId());
 
         if (pessoa.getEndereco().size() == 0 || pessoa.getEndereco() == null) {
             oldPessoa.getEndereco().forEach(endereco -> {
-                this.enderecoService.removerEndereco(endereco.getId());
+                this.enderecoService.deleteAddressById(endereco.getId());
             });
         } else {
             pessoa.getEndereco().forEach(endereco -> {
-                this.enderecoService.registrarEndereco(endereco, oldPessoa.getId());
+                this.enderecoService.saveAddress(endereco, oldPessoa.getId());
             });
         }
-        this.pessoaService.atualizarPessoa(pessoa.getId(), pessoa);
+        this.pessoaService.updatePeople(pessoa.getId(), pessoa);
         return ResponseEntity.noContent().build();
     }
 }
