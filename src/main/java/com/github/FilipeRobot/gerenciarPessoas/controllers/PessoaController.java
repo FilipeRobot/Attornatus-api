@@ -32,8 +32,7 @@ public class PessoaController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Pessoa> buscarPessoaPorId(@PathVariable UUID id) {
-        Pessoa pessoa = this.pessoaService.findPeopleById(id);
-        return ResponseEntity.ok().body(pessoa);
+        return ResponseEntity.ok().body(this.pessoaService.findPeopleById(id));
     }
 
     @PostMapping("/")
@@ -52,6 +51,7 @@ public class PessoaController {
         }
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{id}").buildAndExpand(pessoa.getId()).toUri();
+
         return ResponseEntity.created(uri).build();
     }
 
@@ -69,7 +69,9 @@ public class PessoaController {
                 this.enderecoService.saveAddress(endereco, oldPessoa.getId());
             });
         }
+
         this.pessoaService.updatePeople(pessoa.getId(), pessoa);
+
         return ResponseEntity.noContent().build();
     }
 }
